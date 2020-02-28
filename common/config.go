@@ -4,5 +4,4 @@ package common
 type Config interface {
 	Set(key string, value interface{}) (bool, error)
 	Get(key string) interface{}
-	List() map[string]interface{}
 }

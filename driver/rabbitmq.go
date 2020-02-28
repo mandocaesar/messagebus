@@ -21,7 +21,7 @@ func (d *DriverRMQ) SendReply(topic string) error { return nil }
 func (d *DriverRMQ) PublishTo(topic string) error { return nil }
 
 //Publish to an exchange or queue
-func (d *DriverRMQ) Publish(model interface{}) (interface{}, error) { return nil, nil }
+func (d *DriverRMQ) Publish(model interface{}) error { return nil }
 
 //Subscribe to a queue or exchange
 func (d *DriverRMQ) Subscribe(model interface{}) interface{} { return nil }

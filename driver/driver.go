@@ -8,6 +8,6 @@ type Driver interface {
 	Connect() error
 	SendReply(topic string) error
 	PublishTo(topic string) error
-	Publish(model interface{}) (interface{}, error)
+	Publish(model interface{}) error
 	Subscribe(model interface{}) interface{}
 }

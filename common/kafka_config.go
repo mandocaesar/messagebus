@@ -16,7 +16,7 @@ func (k *KafkaConfig) Set(key string, value interface{}) (bool, error) {
 	result := false
 	var err error
 	switch key {
-	case "brokerUrls":
+	case "brokers":
 		k.BrokerURLs = value.([]string)
 	case "timeout":
 		k.TimeOut = value.(time.Duration)
@@ -27,13 +27,13 @@ func (k *KafkaConfig) Set(key string, value interface{}) (bool, error) {
 }
 
 //Get return specific kafka config by key
-func (k *KafkaConfig) Get(key string) (interface{}, error) {
+func (k *KafkaConfig) Get(key string) interface{} {
 	switch key {
-	case "brokerUrls":
-		return k.BrokerURLs, nil
+	case "brokers":
+		return k.BrokerURLs
 	case "timeout":
-		return k.TimeOut, nil
+		return k.TimeOut
 	default:
-		return nil, errors.New("config not found")
+		return nil
 	}
 }

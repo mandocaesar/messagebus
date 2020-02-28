@@ -28,9 +28,8 @@ func TestPublishFromBus(t *testing.T) {
 	driver := &driver.DriverRMQ{}
 	a, err := NewMessageBus(driver, "schemas")
 
-	result, err := a.Publish("a")
+	err = a.Publish("a")
 	assert.Assert(t, err == nil)
-	assert.Assert(t, result)
 }
 
 func register(data interface{}) (interface{}, error) {

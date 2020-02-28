@@ -39,12 +39,12 @@ func NewMessageBus(service driver.Driver, avroSchemaFolder string) (*MessageBus,
 }
 
 //Publish a message to message queue
-func (m *MessageBus) Publish(model interface{}) (interface{}, error) {
-	result, err := m.Service.Publish(model)
+func (m *MessageBus) Publish(model interface{}) error {
+	err := m.Service.Publish(model)
 	if err != nil {
 		logrus.Error(err)
 	}
-	return result, err
+	return err
 }
 
 //RegisterHandler function to register handler function when an event occured
