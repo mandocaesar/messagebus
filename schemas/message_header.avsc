@@ -1,0 +1,12 @@
+{
+  "type": "record",
+  "namespace": "kata",
+  "name": "MessageHeader",
+  "fields": [
+    { "name": "messageId", "type": "string" },
+    { "name": "correlationId", "type": "string" },
+    { "name": "returnAddress", "type": "string" },
+    { "name": "messageType", "type": "int" },
+    { "name": "messageFlags", "type": "int" }
+  ]
+}
