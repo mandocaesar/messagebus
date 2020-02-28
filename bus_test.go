@@ -1,7 +1,7 @@
 package main
 
 import (
-	driver "mandocaesar/messagebus/driver/rabbitMQ"
+	driver "mandocaesar/messagebus/driver"
 	"testing"
 
 	"github.com/sirupsen/logrus"
