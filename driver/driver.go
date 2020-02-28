@@ -7,7 +7,7 @@ type Driver interface {
 	SetConfig() common.Config
 	Connect() error
 	SendReply(topic string) error
-	PublishTo(topic string)
+	PublishTo(topic string) error
 	Publish(model interface{}) (interface{}, error)
 	Subscribe(model interface{}) interface{}
 }
