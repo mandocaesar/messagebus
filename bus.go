@@ -5,14 +5,14 @@ import (
 
 	"path/filepath"
 
-	"github.com/mandocaesar/messagebus/driver"
+	driver "mandocaesar/messagebus/driver"
 
 	"github.com/sirupsen/logrus"
 )
 
 //MessageBus abstraction struct for message bus
 type MessageBus struct {
-	service       *driver.Driver
+	Service       driver.Driver
 	Channel       string
 	Schemas       []string
 	Handlers      map[string]func(data interface{})
@@ -21,21 +21,22 @@ type MessageBus struct {
 }
 
 //NewMessageBus intantiate new MessageBus instance with specific driver
-func NewMessageBus(service *driver.Driver, avroSchemaFolder string) (*MessageBus, error) {
+func NewMessageBus(service driver.Driver, avroSchemaFolder string) (*MessageBus, error) {
 	var files []string
 	err := filepath.Walk(avroSchemaFolder, func(path string, info os.FileInfo, err error) error {
 		files = append(files, path)
 		return nil
 	})
+
 	if err != nil {
 		panic(err)
 	}
-	return &MessageBus{service: service, Schemas: files}, nil
+	return &MessageBus{Service: service, Schemas: files}, nil
 }
 
 //Publish a message to message queue
-func (m *MessageBus) Publish(model string) (interface{}, error) {
-	result, err := m.service.Publish(model)
+func (m *MessageBus) Publish(model interface{}) (interface{}, error) {
+	result, err := m.Service.Publish(model)
 	if err != nil {
 		logrus.Error(err)
 	}

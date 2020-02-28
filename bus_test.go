@@ -1,14 +1,24 @@
 package main
 
 import (
+	driver "mandocaesar/messagebus/driver/rabbitMQ"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
+	"gotest.tools/assert"
 )
 
-func TestBus(t *testing.T) {
-	var a string = "Hello"
-	var b string = "Hello"
+func TestNewMessageBus(t *testing.T) {
+	driver := &driver.DriverRMQ{}
+	a, err := NewMessageBus(driver, "schemas")
 
-	assert.Equal(t, a, b, "The two words should be the same.")
+	assert.Assert(t, err == nil)
+	assert.Assert(t, a != nil)
+}
+
+func TestSchemasFolderShouldNotEmpty(t *testing.T) {
+	driver := &driver.DriverRMQ{}
+	a, err := NewMessageBus(driver, "schemas")
+
+	assert.Assert(t, err == nil)
+	assert.Assert(t, len(a.Schemas) > 0)
 }
