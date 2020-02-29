@@ -39,9 +39,11 @@ func register(data interface{}) (interface{}, error) {
 func TestGetHandlers(t *testing.T) {
 	driver := &driver.DriverRMQ{}
 	a, _ := NewMessageBus(driver, "schemas")
+	var handleThis = "hello world!"
 
 	a.RegisterHandler("event.user.created", register)
-	result, err := a.Handle("event.user.created", driver)
+	result, err := a.Handle("event.user.created", handleThis)
+
 	assert.Assert(t, err == nil)
-	assert.Assert(t, result)
+	assert.Assert(t, result == handleThis)
 }
