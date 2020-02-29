@@ -4,6 +4,7 @@ go 1.13
 
 require (
 	github.com/google/go-cmp v0.4.0 // indirect
+	github.com/joho/godotenv v1.3.0
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/satori/uuid v1.2.0
 	github.com/segmentio/kafka-go v0.3.5
