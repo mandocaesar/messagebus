@@ -7,7 +7,7 @@ type DriverRMQ struct {
 }
 
 //SetConfig set config configuration
-func (d *DriverRMQ) SetConfig() common.Config {
+func (d *DriverRMQ) SetConfig(key string, value interface{}) common.Config {
 	return nil
 }
 

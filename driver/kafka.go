@@ -13,7 +13,7 @@ import (
 
 //DriverKafka kafka driver struct
 type DriverKafka struct {
-	config         common.KafkaConfig
+	kafkaConfig    common.KafkaConfig
 	ConsumerConfig kafka.ReaderConfig
 	Consumer       *kafka.Reader
 
@@ -23,7 +23,7 @@ type DriverKafka struct {
 
 func (d *DriverKafka) initiateProducer() {
 	d.ProducerConfig = kafka.WriterConfig{
-		Brokers:          d.config.Get("brokers").([]string),
+		Brokers:          d.kafkaConfig.Get("brokers").([]string),
 		Balancer:         &kafka.LeastBytes{},
 		CompressionCodec: snappy.NewCompressionCodec(),
 		// BatchTimeout:     10 * time.Millisecond,
@@ -34,12 +34,16 @@ func (d *DriverKafka) initiateProducer() {
 }
 
 //NewDriverKafka intantiate new kafka driver
-func NewDriverKafka(config *common.Config) (*DriverKafka, error) {
-	return nil, nil
+func NewDriverKafka(config common.Config) (*DriverKafka, error) {
+	kafkaConfig := config.(*common.KafkaConfig)
+
+	driver := &DriverKafka{kafkaConfig: *kafkaConfig}
+	driver.initiateProducer()
+	return driver, nil
 }
 
 //SetConfig set config configuration
-func (d *DriverKafka) SetConfig() common.Config {
+func (d *DriverKafka) SetConfig(key string, value interface{}) common.Config {
 	return nil
 }
 
