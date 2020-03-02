@@ -18,15 +18,25 @@ func (a *AvroSerializer) GetAllSchema(path string) interface{} {
 	if path == "" {
 		path = "../schemas/"
 	}
-	a.schemas = avro.LoadSchemas(path)
+
+	//retry load schemas
+	if len(a.schemas) == 0 {
+		a.schemas = avro.LoadSchemas(path)
+	}
+
 	return a.schemas
 }
 
 //GetSchema get schema by key
 func (a *AvroSerializer) GetSchema(name string) interface{} {
+	if name == "" {
+		return nil
+	}
+
 	if len(a.schemas) > 0 {
 		return a.schemas[name]
 	}
+
 	return nil
 }
 
