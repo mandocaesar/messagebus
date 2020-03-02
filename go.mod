@@ -11,5 +11,6 @@ require (
 	github.com/sirupsen/logrus v1.4.2
 	github.com/stretchr/testify v1.5.1
 	golang.org/x/tools v0.0.0-20200227222343-706bc42d1f0d // indirect
+	gopkg.in/avro.v0 v0.0.0-20171217001914-a730b5802183
 	gotest.tools v2.2.0+incompatible
 )
