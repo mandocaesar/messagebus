@@ -35,7 +35,6 @@ func TestAvroGetNilSchema(t *testing.T) {
 
 func TestAvroGetNilSchemas(t *testing.T) {
 	avro := NewAvroSerializer()
-	avro.GetAllSchema("")
 	result := avro.GetSchema("kata.MessageHeader")
 	assert.Assert(t, result == nil)
 }
