@@ -3,6 +3,7 @@ module mandocaesar/messagebus
 go 1.13
 
 require (
+	github.com/actgardner/gogen-avro v6.3.1+incompatible
 	github.com/google/go-cmp v0.4.0 // indirect
 	github.com/joho/godotenv v1.3.0
 	github.com/pkg/errors v0.9.1 // indirect

@@ -1,8 +1,11 @@
 package serializer
 
 import (
+	"bytes"
+	"mandocaesar/messagebus/message"
 	"testing"
 
+	"github.com/satori/uuid"
 	avrolib "gopkg.in/avro.v0"
 	"gotest.tools/assert"
 )
@@ -49,6 +52,44 @@ func TestAvroParse(t *testing.T) {
 		}`
 	avro := NewAvroSerializer()
 	result, err := avro.ParseSchema(testSchema)
+	schema := result.(avrolib.Schema)
+
+	assert.Assert(t, err == nil)
+	assert.Assert(t, schema != nil)
+}
+
+func TestAvroDecode(t *testing.T) {
+	avro := NewAvroSerializer()
+	avro.GetAllSchema("../schemas/")
+	header := &message.MessageHeader{
+		MessageId:     uuid.NewV4().String(),
+		CorrelationId: uuid.NewV4().String(),
+		MessageFlags:  1,
+		MessageType:   1,
+		ReturnAddress: "amqp.libgen.com",
+	}
+
+	result, err := avro.Encode(header, "kata.MessageHeader")
+
 	assert.Assert(t, err == nil)
 	assert.Assert(t, result != nil)
+}
+
+func TestAvroGetHeader(t *testing.T) {
+	avro := NewAvroSerializer()
+	avro.GetAllSchema("../schemas/")
+	header := &message.MessageHeader{
+		MessageId:     uuid.NewV4().String(),
+		CorrelationId: uuid.NewV4().String(),
+		MessageFlags:  1,
+		MessageType:   1,
+		ReturnAddress: "amqp.libgen.com",
+	}
+
+	result, _ := avro.Encode(header, "kata.MessageHeader")
+
+	// headerDecode := avro.GetHeader(result)
+	headerDecode, err := message.DeserializeMessageHeader(bytes.NewReader(result))
+	assert.Assert(t, err == nil)
+	assert.Assert(t, headerDecode.MessageId != "")
 }

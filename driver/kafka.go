@@ -2,6 +2,7 @@ package driver
 
 import (
 	"context"
+	"errors"
 	"mandocaesar/messagebus/common"
 	"mandocaesar/messagebus/message"
 
@@ -13,10 +14,12 @@ import (
 
 //DriverKafka kafka driver struct
 type DriverKafka struct {
-	kafkaConfig    common.KafkaConfig
+	kafkaConfig common.KafkaConfig
+
+	//Kafka Consumer
 	ConsumerConfig kafka.ReaderConfig
 	Consumer       *kafka.Reader
-
+	//Kafka Producer
 	ProducerConfig kafka.WriterConfig
 	Producer       *kafka.Writer
 }
@@ -31,6 +34,16 @@ func (d *DriverKafka) initiateProducer() {
 		// ReadTimeout:      c.TimeOut,
 	}
 
+}
+
+func (d *DriverKafka) initiateConsumer() {
+	d.ConsumerConfig = kafka.ReaderConfig{
+		Brokers:  d.kafkaConfig.Get("brokers").([]string),
+		MinBytes: 10e3, // 10KB
+		MaxBytes: 10e6, // 10MB
+		// MaxWait:         30 * time.Millisecond, // Maximum amount of time to wait for new data to come when fetching batches of messages from kafka.
+		// ReadLagInterval: -1,
+	}
 }
 
 //NewDriverKafka intantiate new kafka driver
@@ -51,7 +64,7 @@ func (d *DriverKafka) SetConfig(key string, value interface{}) common.Config {
 func (d *DriverKafka) Connect() error { return nil }
 
 //SendReply reply to request reply pattern
-func (d *DriverKafka) SendReply(topic string) error { return nil }
+func (d *DriverKafka) SendReply(topic string) error { return errors.New("Not Implemented yet") }
 
 //PublishTo publish to a topic
 func (d *DriverKafka) PublishTo(topic string) error { return nil }
@@ -75,13 +88,32 @@ func (d *DriverKafka) Publish(model interface{}) error {
 	}
 
 	logrus.Info("Message published")
-	logrus.Info(
-		"Topic : "+data.Topic,
-		" Key : "+string(data.Key),
-		" Value : "+string(data.Message),
-	)
+	logrus.Infof(
+		"Topic : %s, Key : %s, Value : %s",
+		data.Topic, data.Key, data.Message)
+
 	return nil
 }
 
 //Subscribe to a queue or exchange
-func (d *DriverKafka) Subscribe(model interface{}) interface{} { return nil }
+func (d *DriverKafka) Subscribe(model interface{}) interface{} {
+	data := model.(message.SubscribeMessage)
+
+	d.ConsumerConfig.Topic = data.Topic
+	d.ConsumerConfig.GroupID = data.Group
+
+	d.Consumer = kafka.NewReader(d.ConsumerConfig)
+	defer d.Consumer.Close()
+
+	//ctx := context.Background()
+
+	// for {
+	// 	message, err := d.Consumer.FetchMessage(ctx)
+	// 	if err != nil {
+	// 		logrus.Error(err)
+	// 	}
+
+	// }
+
+	return nil
+}

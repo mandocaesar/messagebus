@@ -6,3 +6,10 @@ type ProducerMessage struct {
 	Key     []byte
 	Message []byte
 }
+
+//SubscribeMessage kafka
+type SubscribeMessage struct {
+	Topic string
+	Group string
+	Fn    func(interface{})
+}

@@ -1,5 +1,7 @@
 github.com/DataDog/zstd v1.4.0 h1:vhoV+DUHnRZdKW1i5UMjAk2G4JY8wN4ayRfYDNdEhwo=
 github.com/DataDog/zstd v1.4.0/go.mod h1:1jcaCB/ufaK+sKp1NBhlGmpz41jOoPQ35bpF36t7BBo=
+github.com/actgardner/gogen-avro v6.3.1+incompatible h1:ZFZNRo+Ik8UPTp3ClQIYSbSN2dx695qWEnfv6U872hM=
+github.com/actgardner/gogen-avro v6.3.1+incompatible/go.mod h1:N2PzqZtS+5w9xxGp2daeykhWdTL0lBiRhbbvkVj4Yd8=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
