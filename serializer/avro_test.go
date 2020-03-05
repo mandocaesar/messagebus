@@ -1,7 +1,6 @@
 package serializer
 
 import (
-	"bytes"
 	"mandocaesar/messagebus/message"
 	"testing"
 
@@ -88,8 +87,8 @@ func TestAvroGetHeader(t *testing.T) {
 
 	result, _ := avro.Encode(header, "kata.MessageHeader")
 
-	// headerDecode := avro.GetHeader(result)
-	headerDecode, err := message.DeserializeMessageHeader(bytes.NewReader(result))
+	headerDecode, err := avro.GetHeader(result)
+
 	assert.Assert(t, err == nil)
 	assert.Assert(t, headerDecode.MessageId != "")
 }

@@ -14,7 +14,7 @@ type AvroSerializer struct {
 }
 
 //NewAvroSerializer return new avro serializer instance
-func NewAvroSerializer() *AvroSerializer {
+func NewAvroSerializer() Serializer {
 	schemas := map[string]avro.Schema{}
 	return &AvroSerializer{schemas: schemas}
 }
@@ -44,30 +44,19 @@ func (a *AvroSerializer) GetSchema(name string) interface{} {
 }
 
 //GetHeader parse header into struct
-func (a *AvroSerializer) GetHeader(data []byte) message.Header {
-	//buffer := new(bytes.Buffer)
-	//	schema := a.GetSchema("kata.MessageHeader")
-	schema := a.schemas["kata.MessageHeader"]
-	datumReader := avro.NewSpecificDatumReader()
-	datumReader.SetSchema(schema)
+func (a *AvroSerializer) GetHeader(data []byte) (*message.MessageHeader, error) {
+	return message.DeserializeMessageHeader(bytes.NewReader(data))
+}
 
-	decoder := avro.NewBinaryDecoder(data)
-
-	result := &message.Header{}
-	if err := datumReader.Read(result, decoder); err != nil {
-		logrus.Error(err)
-	}
-
-	return *result
+//Decode parse byte to struct
+func (a *AvroSerializer) Decode(data []byte) (interface{}, error) {
+	return message.DeserializeMessageHeader(bytes.NewReader(data))
 }
 
 //ParseSchema parse string schema into a avro format
 func (a *AvroSerializer) ParseSchema(schema string) (interface{}, error) {
 	return avro.ParseSchema(schema)
 }
-
-//Decode a avro binary into struct
-func (a *AvroSerializer) Decode(data interface{}, asStruct interface{}) interface{} { return nil }
 
 //Encode a schema into avro binary
 func (a *AvroSerializer) Encode(data interface{}, schemaName string) ([]byte, error) {
