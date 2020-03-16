@@ -8,6 +8,6 @@ type Serializer interface {
 	GetSchema(name string) interface{}
 	GetHeader(data []byte) (*message.MessageHeader, error)
 	ParseSchema(schema string) (interface{}, error)
-	Decode(data []byte) (interface{}, error)
+	Decode(data []byte, schemaName string) (interface{}, error)
 	Encode(data interface{}, schemaName string) ([]byte, error)
 }

@@ -23,7 +23,7 @@ func TestAvroGetSchemaZeroLength(t *testing.T) {
 
 func TestAvroGetSchema(t *testing.T) {
 	avro := NewAvroSerializer()
-	avro.GetAllSchema("../schemas/")
+	avro.GetAllSchema("../example/schemas/")
 	result := avro.GetSchema("kata.MessageHeader")
 	assert.Assert(t, result != nil)
 }
@@ -57,9 +57,9 @@ func TestAvroParse(t *testing.T) {
 	assert.Assert(t, schema != nil)
 }
 
-func TestAvroDecode(t *testing.T) {
+func TestAvroEncode(t *testing.T) {
 	avro := NewAvroSerializer()
-	avro.GetAllSchema("../schemas/")
+	avro.GetAllSchema("../example/schemas/")
 	header := &message.MessageHeader{
 		MessageId:     uuid.NewV4().String(),
 		CorrelationId: uuid.NewV4().String(),
@@ -76,7 +76,7 @@ func TestAvroDecode(t *testing.T) {
 
 func TestAvroGetHeader(t *testing.T) {
 	avro := NewAvroSerializer()
-	avro.GetAllSchema("../schemas/")
+	avro.GetAllSchema("../example/schemas/")
 	header := &message.MessageHeader{
 		MessageId:     uuid.NewV4().String(),
 		CorrelationId: uuid.NewV4().String(),
@@ -86,9 +86,16 @@ func TestAvroGetHeader(t *testing.T) {
 	}
 
 	result, _ := avro.Encode(header, "kata.MessageHeader")
+	DecodeResult, err := avro.Decode(result, "kata.MessageHeader")
+	// model, err := avro.Decode(result)
+	// if err != nil {
+	// 	t.Error(err)
+	// }
 
-	headerDecode, err := avro.GetHeader(result)
+	// lala := model.(*message.MessageHeader)
+	// t.Log(lala)
+	//headerDecode, err := avro.GetHeader(result)
 
 	assert.Assert(t, err == nil)
-	assert.Assert(t, headerDecode.MessageId != "")
+	assert.Assert(t, DecodeResult != nil)
 }

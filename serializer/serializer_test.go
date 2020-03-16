@@ -22,7 +22,7 @@ func MockFuncSerializeHeader(serializer Serializer) ([]byte, error) {
 
 func TestSerializerAsAvro(t *testing.T) {
 	avro := NewAvroSerializer()
-	avro.GetAllSchema("../schemas/")
+	avro.GetAllSchema("../example/schemas/")
 
 	result, err := MockFuncSerializeHeader(avro)
 	headerDecode, err := avro.GetHeader(result)

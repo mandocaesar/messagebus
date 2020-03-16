@@ -5,7 +5,9 @@ import (
 	"os"
 	"time"
 
+	dotenv "github.com/joho/godotenv"
 	_ "github.com/joho/godotenv/autoload"
+	"github.com/sirupsen/logrus"
 )
 
 //KafkaConfig is to configure kafka connections
@@ -15,14 +17,20 @@ type KafkaConfig struct {
 }
 
 //Instantiate initiatlize kafka config
-func (k *KafkaConfig) Instantiate() {
+func (k *KafkaConfig) Instantiate(path string) {
 	// A duration string is a possibly signed sequence of
 	// decimal numbers, each with optional fraction and a unit suffix,
 	// such as "300ms", "-1.5h" or "2h45m".
 	// Valid time units are "ns", "us" (or "µs"), "ms", "s", "m", "h".
-	duration, _ := time.ParseDuration(os.Getenv("timeout"))
+	if len(path) > 0 {
+		err := dotenv.Load(path)
+		if err != nil {
+			logrus.Panic(err)
+		}
+	}
+	duration, _ := time.ParseDuration(os.Getenv("TIMEOUT"))
 
-	k.BrokerURLs = os.Getenv("brokerurls")
+	k.BrokerURLs = os.Getenv("BROKERS")
 	k.TimeOut = duration
 }
 
@@ -42,13 +50,13 @@ func (k *KafkaConfig) Set(key string, value interface{}) (bool, error) {
 }
 
 //Get return specific kafka config by key
-func (k *KafkaConfig) Get(key string) interface{} {
+func (k *KafkaConfig) Get(key string) string {
 	switch key {
 	case "brokers":
 		return k.BrokerURLs
 	case "timeout":
-		return k.TimeOut
+		return k.TimeOut.String()
 	default:
-		return nil
+		return ""
 	}
 }

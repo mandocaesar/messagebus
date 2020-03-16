@@ -49,8 +49,19 @@ func (a *AvroSerializer) GetHeader(data []byte) (*message.MessageHeader, error) 
 }
 
 //Decode parse byte to struct
-func (a *AvroSerializer) Decode(data []byte) (interface{}, error) {
-	return message.DeserializeMessageHeader(bytes.NewReader(data))
+func (a *AvroSerializer) Decode(data []byte, schemaName string) (interface{}, error) {
+
+	reader := avro.NewSpecificDatumReader()
+	reader.SetSchema(a.schemas[schemaName])
+
+	buffer := new(bytes.Buffer)
+	header := new(message.MessageHeader)
+
+	decoder := avro.NewBinaryDecoder(buffer.Bytes())
+
+	err := reader.Read(header, decoder)
+
+	return header, err
 }
 
 //ParseSchema parse string schema into a avro format
@@ -65,6 +76,7 @@ func (a *AvroSerializer) Encode(data interface{}, schemaName string) ([]byte, er
 
 	var buf bytes.Buffer
 	err := writer.Write(data, avro.NewBinaryEncoder(&buf))
+
 	logrus.Error(err)
 	return buf.Bytes(), err
 }

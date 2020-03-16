@@ -14,15 +14,15 @@ import (
 )
 
 type MessageHeader struct {
-	MessageId string
+	MessageId string `avro:"messageId"`
 
-	CorrelationId string
+	CorrelationId string `avro:"correlationId"`
 
-	ReturnAddress string
+	ReturnAddress string `avro:"returnAddress"`
 
-	MessageType int32
+	MessageType int32 `avro:"messageType"`
 
-	MessageFlags int32
+	MessageFlags int32 `avro:"messageFlags"`
 }
 
 func NewMessageHeader() *MessageHeader {

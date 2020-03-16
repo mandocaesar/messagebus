@@ -2,7 +2,7 @@ package common
 
 //Config interface for driver
 type Config interface {
-	Instantiate()
+	Instantiate(path string)
 	Set(key string, value interface{}) (bool, error)
-	Get(key string) interface{}
+	Get(key string) string
 }

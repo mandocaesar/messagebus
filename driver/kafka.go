@@ -5,6 +5,8 @@ import (
 	"errors"
 	"mandocaesar/messagebus/common"
 	"mandocaesar/messagebus/message"
+	"mandocaesar/messagebus/serializer"
+	"strings"
 
 	"github.com/segmentio/kafka-go"
 	"github.com/segmentio/kafka-go/snappy"
@@ -12,9 +14,9 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-//DriverKafka kafka driver struct
-type DriverKafka struct {
-	kafkaConfig common.KafkaConfig
+//Kafka kafka driver struct
+type Kafka struct {
+	kafkaConfig *common.KafkaConfig
 
 	//Kafka Consumer
 	ConsumerConfig kafka.ReaderConfig
@@ -24,9 +26,9 @@ type DriverKafka struct {
 	Producer       *kafka.Writer
 }
 
-func (d *DriverKafka) initiateProducer() {
+func (d *Kafka) initiateProducer() {
 	d.ProducerConfig = kafka.WriterConfig{
-		Brokers:          d.kafkaConfig.Get("brokers").([]string),
+		Brokers:          strings.Split(d.kafkaConfig.Get("brokers"), ";"),
 		Balancer:         &kafka.LeastBytes{},
 		CompressionCodec: snappy.NewCompressionCodec(),
 		// BatchTimeout:     10 * time.Millisecond,
@@ -36,9 +38,10 @@ func (d *DriverKafka) initiateProducer() {
 
 }
 
-func (d *DriverKafka) initiateConsumer() {
+func (d *Kafka) initiateConsumer() {
+
 	d.ConsumerConfig = kafka.ReaderConfig{
-		Brokers:  d.kafkaConfig.Get("brokers").([]string),
+		Brokers:  strings.Split(d.kafkaConfig.Get("brokers"), ";"),
 		MinBytes: 10e3, // 10KB
 		MaxBytes: 10e6, // 10MB
 		// MaxWait:         30 * time.Millisecond, // Maximum amount of time to wait for new data to come when fetching batches of messages from kafka.
@@ -46,32 +49,36 @@ func (d *DriverKafka) initiateConsumer() {
 	}
 }
 
-//NewDriverKafka intantiate new kafka driver
-func NewDriverKafka(config common.Config) (*DriverKafka, error) {
+//NewKafka intantiate new kafka driver
+func NewKafka(config common.Config) (Driver, error) {
 	kafkaConfig := config.(*common.KafkaConfig)
 
-	driver := &DriverKafka{kafkaConfig: *kafkaConfig}
+	driver := &Kafka{kafkaConfig: kafkaConfig}
 	driver.initiateProducer()
+	driver.initiateConsumer()
+
 	return driver, nil
 }
 
 //SetConfig set config configuration
-func (d *DriverKafka) SetConfig(key string, value interface{}) common.Config {
+func (d *Kafka) SetConfig(key string, value interface{}) common.Config {
 	return nil
 }
 
 //Connect connect to rmq message broker
-func (d *DriverKafka) Connect() error { return nil }
+func (d *Kafka) Connect() interface{} {
+	return d.Producer.Stats().Dials
+}
 
 //SendReply reply to request reply pattern
-func (d *DriverKafka) SendReply(topic string) error { return errors.New("Not Implemented yet") }
+func (d *Kafka) SendReply(topic string) error { return errors.New("Not Implemented yet") }
 
 //PublishTo publish to a topic
-func (d *DriverKafka) PublishTo(topic string) error { return nil }
+func (d *Kafka) PublishTo(topic string) error { return nil }
 
 //Publish to an exchange or queue
-func (d *DriverKafka) Publish(model interface{}) error {
-	data := model.(message.ProducerMessage)
+func (d *Kafka) Publish(model interface{}) error {
+	data := model.(*message.ProducerMessage)
 
 	d.ProducerConfig.Topic = data.Topic
 	d.Producer = kafka.NewWriter(d.ProducerConfig)
@@ -96,7 +103,7 @@ func (d *DriverKafka) Publish(model interface{}) error {
 }
 
 //Subscribe to a queue or exchange
-func (d *DriverKafka) Subscribe(model interface{}) interface{} {
+func (d *Kafka) Subscribe(model interface{}, serializer serializer.Serializer, fn func(key string, data interface{}) (interface{}, error)) {
 	data := model.(message.SubscribeMessage)
 
 	d.ConsumerConfig.Topic = data.Topic
@@ -105,15 +112,22 @@ func (d *DriverKafka) Subscribe(model interface{}) interface{} {
 	d.Consumer = kafka.NewReader(d.ConsumerConfig)
 	defer d.Consumer.Close()
 
-	//ctx := context.Background()
+	ctx := context.Background()
 
-	// for {
-	// 	message, err := d.Consumer.FetchMessage(ctx)
-	// 	if err != nil {
-	// 		logrus.Error(err)
-	// 	}
+	for {
+		message, err := d.Consumer.FetchMessage(ctx)
+		if err != nil {
+			logrus.Error(err)
+		}
 
-	// }
+		header, err := serializer.GetHeader(message.Value)
 
-	return nil
+		result, err := fn(header.MessageId, message.Value)
+		if err != nil {
+			logrus.Error(err)
+		} else {
+			logrus.Info(result)
+		}
+
+	}
 }
