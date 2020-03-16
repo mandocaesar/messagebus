@@ -103,8 +103,8 @@ func (d *Kafka) Publish(model interface{}) error {
 }
 
 //Subscribe to a queue or exchange
-func (d *Kafka) Subscribe(model interface{}, serializer serializer.Serializer, fn func(key string, data interface{}) (interface{}, error)) {
-	data := model.(message.SubscribeMessage)
+func (d *Kafka) Subscribe(model interface{}, serializer serializer.Serializer, functions map[int32]func(data interface{}) (interface{}, error)) (interface{}, error) {
+	data := model.(*message.SubscribeMessage)
 
 	d.ConsumerConfig.Topic = data.Topic
 	d.ConsumerConfig.GroupID = data.Group
@@ -122,12 +122,12 @@ func (d *Kafka) Subscribe(model interface{}, serializer serializer.Serializer, f
 
 		header, err := serializer.GetHeader(message.Value)
 
-		result, err := fn(header.MessageId, message.Value)
+		result, err := functions[header.MessageType](message.Value)
 		if err != nil {
 			logrus.Error(err)
 		} else {
 			logrus.Info(result)
 		}
-
+		return result, err
 	}
 }

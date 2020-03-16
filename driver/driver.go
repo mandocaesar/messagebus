@@ -12,5 +12,5 @@ type Driver interface {
 	SendReply(topic string) error
 	PublishTo(topic string) error
 	Publish(model interface{}) error
-	Subscribe(model interface{}, serializer serializer.Serializer, fn func(key string, data interface{}) (interface{}, error))
+	Subscribe(model interface{}, serializer serializer.Serializer, functions map[int32]func(data interface{}) (interface{}, error)) (interface{}, error)
 }

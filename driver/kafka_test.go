@@ -11,8 +11,9 @@ import (
 )
 
 type KafkaTest struct {
-	Config *common.KafkaConfig
-	Driver Driver
+	Config    *common.KafkaConfig
+	Driver    Driver
+	Functions map[int32]func(data interface{}) (interface{}, error)
 }
 
 func NewKafkaTest() *KafkaTest {
@@ -20,11 +21,11 @@ func NewKafkaTest() *KafkaTest {
 	config.Instantiate("../.env.example")
 
 	driver, err := NewKafka(config)
-
+	functions := make(map[int32]func(data interface{}) (interface{}, error))
 	if err != nil {
 		return nil
 	}
-	return &KafkaTest{Config: config, Driver: driver}
+	return &KafkaTest{Config: config, Driver: driver, Functions: functions}
 }
 
 func TestKafkaDriverInstantiate(t *testing.T) {
@@ -56,5 +57,23 @@ func TestKafkaPublish(t *testing.T) {
 		Message: serializeMessage}
 
 	err = instance.Driver.Publish(message)
+	assert.Assert(t, err == nil)
+}
+
+func Handle(model interface{}) (interface{}, error) {
+	return model, nil
+}
+
+func TestKafkaConsume(t *testing.T) {
+	instance := NewKafkaTest()
+	avroSerializer := serializer.NewAvroSerializer()
+	avroSerializer.GetAllSchema("../example/schemas/")
+	subscription := &message.SubscribeMessage{Group: "", Topic: "test"}
+
+	instance.Functions[0] = Handle
+	instance.Functions[1] = Handle
+
+	result, err := instance.Driver.Subscribe(subscription, avroSerializer, instance.Functions)
+	assert.Assert(t, result != nil)
 	assert.Assert(t, err == nil)
 }
