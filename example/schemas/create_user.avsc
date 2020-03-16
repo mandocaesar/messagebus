@@ -1,0 +1,19 @@
+{
+  "type": "record",
+  "namespace": "kata",
+  "name": "CreateUser",
+  "fields": [
+    {
+      "name": "id",
+      "type": "string"
+    },
+    {
+      "name": "userName",
+      "type": "string"
+    },
+    {
+      "name": "address",
+      "type": "string"
+    }
+  ]
+}
