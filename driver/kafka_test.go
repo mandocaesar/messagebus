@@ -1,6 +1,7 @@
 package driver
 
 import (
+	"bytes"
 	"mandocaesar/messagebus/common"
 	"mandocaesar/messagebus/message"
 	"mandocaesar/messagebus/serializer"
@@ -61,7 +62,7 @@ func TestKafkaPublish(t *testing.T) {
 }
 
 func Handle(model interface{}) (interface{}, error) {
-	return model, nil
+	return message.DeserializeMessageHeader(bytes.NewReader(model.([]byte)))
 }
 
 func TestKafkaConsume(t *testing.T) {
