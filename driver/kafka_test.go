@@ -61,6 +61,30 @@ func TestKafkaPublish(t *testing.T) {
 	assert.Assert(t, err == nil)
 }
 
+func BenchmarkKafkaPublish(b *testing.B) {
+	instance := NewKafkaTest()
+	avroSerializer := serializer.NewAvroSerializer()
+	avroSerializer.GetAllSchema("../example/schemas/")
+
+	for i := 0; i < b.N; i++ {
+		header := &message.MessageHeader{
+			CorrelationId: "111",
+			MessageFlags:  1,
+			MessageId:     "lalala",
+			MessageType:   1,
+			ReturnAddress: "aaaa"}
+		serializeMessage, _ := avroSerializer.Encode(header, "kata.MessageHeader")
+
+		message := &message.ProducerMessage{
+			Topic:   "test",
+			Key:     []byte("test"),
+			Message: serializeMessage}
+
+		instance.Driver.Publish(message)
+	}
+
+}
+
 func Handle(model interface{}) (interface{}, error) {
 	return message.DeserializeMessageHeader(bytes.NewReader(model.([]byte)))
 }
@@ -77,4 +101,18 @@ func TestKafkaConsume(t *testing.T) {
 	result, err := instance.Driver.Subscribe(subscription, avroSerializer, instance.Functions)
 	assert.Assert(t, result != nil)
 	assert.Assert(t, err == nil)
+}
+
+func BenchmarkKafkaConsume(b *testing.B) {
+	instance := NewKafkaTest()
+	avroSerializer := serializer.NewAvroSerializer()
+	avroSerializer.GetAllSchema("../example/schemas/")
+	subscription := &message.SubscribeMessage{Group: "", Topic: "test"}
+
+	instance.Functions[0] = Handle
+	instance.Functions[1] = Handle
+
+	for i := 0; i < b.N; i++ {
+		instance.Driver.Subscribe(subscription, avroSerializer, instance.Functions)
+	}
 }

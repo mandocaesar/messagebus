@@ -50,9 +50,9 @@ func (m *MessageBus) Publish(model interface{}) error {
 }
 
 //Subscribe subscribe to a topic
-func (m *MessageBus) Subscribe(model interface{}) error {
-	err := m.Service.Subscribe(model, m.Serializer)
-}
+// func (m *MessageBus) Subscribe(model interface{}) error {
+// 	err := m.Service.Subscribe(model, m.Serializer)
+// }
 
 //RegisterHandler function to register handler function when an event occured
 func (m *MessageBus) RegisterHandler(key int, function func(data interface{}) (interface{}, error)) {
